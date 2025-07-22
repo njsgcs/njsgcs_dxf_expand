@@ -2,7 +2,9 @@ from pyautocad import Autocad, APoint
 import math
 # 绘制3D模型
 def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min_y_t):
-   
+    lines=[]
+    arcs=[]
+    circles=[]
     for line in line3d:
         # 解构线条数据
         x1, y1, z1, x2, y2, z2, line_id, line_type, color, view_id = line
@@ -11,7 +13,8 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
             # 绘制直线
             start_point = APoint(x1, y1, z1)
             end_point = APoint(x2, y2, z2)
-            acad.model.AddLine(start_point, end_point)
+            Line=acad.model.AddLine(start_point, end_point)
+            lines.append(Line)
         
         elif line_type == 1:
             # 绘制圆弧
@@ -19,10 +22,15 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
             
             if entity and hasattr(entity, 'StartAngle') and hasattr(entity, 'EndAngle'):
                 arc_entity = entity
+              
                 
                 angle_delta = (arc_entity.EndAngle - arc_entity.StartAngle) * 180 / math.pi
+                
                 center = arc_entity.center
                 radius = arc_entity.radius
+                #print("Center:" + str(center))
+                
+              #  print("EndAngle:" + str(arc_entity.EndAngle* 180 / math.pi) + " StartAngle:" + str(arc_entity.StartAngle* 180 / math.pi) + " angle_delta:" + str(angle_delta))
                 center = tuple(round(coord, 1) for coord in center)
                 radius = round(radius, 1)
                 
@@ -35,10 +43,12 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
 
                     normal = APoint(1.0, 0.0, 0.0)
-                    if (start_x == z1 and start_y == y1 and end_x == z2 and end_y == y2):
+                    if ((start_x == z1 and start_y == y1 and end_x == z2 and end_y == y2)
+                        or (start_x == z2 and start_y == x2 and end_x == z1 and end_y == x1)):
                         center_point = APoint(x1,center_y,center_x)
-                        arc = acad.model.AddArc(center_point, radius, arc_entity.StartAngle, arc_entity.EndAngle)
+                        arc = acad.model.AddArc(center_point, radius,  -arc_entity.EndAngle+math.pi/2,-arc_entity.StartAngle+math.pi/2)
                         arc.Normal = normal
+                        arcs.append(arc)
                 elif view_id == 0:
                     center_x = center[0]
                     center_y = center[1]
@@ -47,10 +57,12 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     end_x = round(center_x + radius * math.cos(arc_entity.EndAngle), 1)
                     end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
                     normal = APoint(0.0, 0.0, 1.0)
-                    if (start_x == x1 and start_y == y1 and end_x == x2 and end_y == y2):
+                    if ((start_x == x1 and start_y == y1 and end_x == x2 and end_y == y2)
+                        or (start_x == x2 and start_y == y2 and end_x == x1 and end_y == y1)):
                         center_point = APoint(center_x, center_y,z1)
                         arc = acad.model.AddArc(center_point, radius, arc_entity.StartAngle, arc_entity.EndAngle)
                         arc.Normal = normal
+                        arcs.append(arc)
                 elif view_id == 1:
                     normal = APoint(0.0, 1.0, 0.0)
                     center_x = center[0]
@@ -59,12 +71,14 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
                     end_x = round(center_x + radius * math.cos(arc_entity.EndAngle), 1)
                     end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
-                    if (start_x == x1 and start_y == z1 and end_x == x2 and end_y == z2):
+                    if ((start_x == x1 and start_y == z1 and end_x == x2 and end_y == z2)
+                        or (start_x == x2 and start_y == z2 and end_x == x1 and end_y == z1)):
                         center_point = APoint(center_x, y1,center_y)
                         arc = acad.model.AddArc(center_point, radius, arc_entity.StartAngle, arc_entity.EndAngle)
                         arc.Normal = normal
+                        arcs.append(arc)
         elif line_type == 2:
-            # 绘制圆
+            # 绘制圆+
             entity = line_map.get(line_id)
             if entity and hasattr(entity, 'center') and hasattr(entity, 'radius'):
                 circle_entity = entity
@@ -72,17 +86,25 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                 radius = circle_entity.radius
                 
                 if view_id == 0:
-                    center_point = APoint(center.x, center.y)
-                    acad.model.AddCircle(center_point, radius)
-                
+                    normal = APoint(0.0, 0.0, 1.0)
+                    center_point = APoint(center[0], center[1],z1)
+                    circle=acad.model.AddCircle(center_point, radius)
+                    circle.normal = normal
+                    circles.append(circle)
                 elif view_id == 1:
-                    center_x = center.x
-                    center_y = center.y - cluster_min_y_t
-                    center_point = APoint(center_x, center_y)
-                    acad.model.AddCircle(center_point, radius)
-                
+                    normal = APoint(0.0, 1.0, 0.0)
+                    center_x = center[0]
+                    center_y = center[1] - cluster_min_y_t
+                    center_point = APoint(center_x,y1,center_y)
+                    circle=acad.model.AddCircle(center_point, radius)
+                    circle.normal = normal
+                    circles.append(circle)
                 elif view_id == 2:
-                    center_x = center.x - cluster_min_x_r
-                    center_y = center.y
-                    center_point = APoint(center_x, center_y)
-                    acad.model.AddCircle(center_point, radius)
+                    normal = APoint(1.0, 0.0, 0.0)
+                    center_x = center[0] - cluster_min_x_r
+                    center_y = center[1]
+                    center_point = APoint(x1,center_y,center_x)
+                    circle=acad.model.AddCircle(center_point, radius)
+                    circle.normal = normal
+                    circles.append(circle)
+    return lines,arcs,circles

@@ -1,8 +1,9 @@
-from connect import get_lines
-from cluster import cluster_lines
-from create_3d_point import generate_3d_points
-from threedv_3dline import generate_3d_lines,make_map
-from draw3d_lines import draw_3d_model
+from threeDrebuild.connect import get_lines
+from threeDrebuild.cluster import cluster_lines
+from threeDrebuild.create_3d_point import generate_3d_points
+from threeDrebuild.threedv_3dline import generate_3d_lines,make_map
+from threeDrebuild.draw3d_lines import draw_3d_model
+from unfold.build_graph import get_graph
 lines, line_map,acad = get_lines()
 
 # for line in lines:
@@ -35,8 +36,8 @@ line3d= generate_3d_lines(result["points_3d"], result["front_lines"], result["to
 
 cluster_min_x_r =clusters[2].min_x 
 cluster_min_y_t =clusters[1] .min_y 
-cluster_min_x = min(cluster.min_x for cluster in clusters)
-cluster_min_y = min(cluster.min_y for cluster in clusters)
+
 
 # 绘制3D模型
-draw_3d_model(acad,line3d, line_map, cluster_min_x_r, cluster_min_y_t)
+lines,arcs,circles=draw_3d_model(acad,line3d, line_map, cluster_min_x_r, cluster_min_y_t)
+

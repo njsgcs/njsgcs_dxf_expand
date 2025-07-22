@@ -88,7 +88,7 @@ def draw_lines(x1, y1, z1, x2, y2, z2, line_id, type_, color, view_id):
     #     pass
     key = ",".join(f"{v:.1f}" for v in [x1, y1, z1, x2, y2, z2])
     if key not in seen_line_pairs:
-        print(f"线段: 起点 ({x1:.1f}, {y1:.1f}, {z1:.1f}), 终点 ({x2:.1f}, {y2:.1f}, {z2:.1f}),type: {type_}, line_id: {line_id}")
+        #print(f"线段: 起点 ({x1:.1f}, {y1:.1f}, {z1:.1f}), 终点 ({x2:.1f}, {y2:.1f}, {z2:.1f}),type: {type_}, line_id: {line_id}")
         seen_line_pairs.add(key)
         lines3d.append([x1, y1, z1, x2, y2, z2, line_id, type_, color, view_id])
     

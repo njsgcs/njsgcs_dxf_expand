@@ -141,8 +141,9 @@ def generate_3d_points(clusters):
         "right_points": right_point_list,
         "points_3d": point_3d_list,
          "right_cluster_min_x":right_cluster.min_x if right_cluster is not None else None,
-        "top_cluster_min_y":top_cluster.min_y if top_cluster is not None else None
-         
+        "top_cluster_min_y":top_cluster.min_y if top_cluster is not None else None,
+         "top_cluster_max_y":top_cluster.max_y if top_cluster is not None else None,
+         "front_cluster_min_y":most_frequent_cluster.min_y if most_frequent_cluster is not None else None
     }
 
 

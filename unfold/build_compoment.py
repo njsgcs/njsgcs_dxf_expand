@@ -10,6 +10,7 @@ def get_component(G_without_arcs: nx.Graph, center_SEpair_map: Dict[str, List[An
 
     component_id_map: Dict[int,ComponentInfo] = {}
     start_id=-1
+    arcname=""
     for i, component in enumerate(components):
         component_points = [ node for node in component]  # 转为 set 提升查找效率
         component_edges = [ edge for edge in G_without_arcs.edges() if edge[0] in component_points and edge[1] in component_points]
@@ -30,6 +31,7 @@ def get_component(G_without_arcs: nx.Graph, center_SEpair_map: Dict[str, List[An
                     # 如果需要记录归属，可选性地加入 component_arc_map
                 if(sepairs_count==len(sepairs)):
                         arc_count += 1
+                        arcname=key[-1]
                         if key not in component_arc_map:
                             component_arc_map[key] = []
                         component_arc_map[key].append(i)
@@ -37,7 +39,8 @@ def get_component(G_without_arcs: nx.Graph, center_SEpair_map: Dict[str, List[An
             # if(sepairs_count==0):
             #     print(f"sepairs{sepairs} ")
         print(f"第 {i+1} 个连通分量有 {len(component)} 个节点，包含的弧有 {arc_count} 条")
-        if arc_count==1 and start_id==-1:start_id=i
+       
+        if arc_count==1 and start_id==-1 and arcname!="Z":start_id=i
     plt.clf()
     nx.draw(G_without_arcs, with_labels=True, node_size=10, font_size=8)
     plt.show()

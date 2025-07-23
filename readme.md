@@ -5,3 +5,9 @@
 ![image](readme_use\Snipaste_2025-07-23_16-39-12.png)
 
 https://gitee.com/njsgcs/annotion_dataset
+
+
+
+
+
+pyinstaller --onefile --console main.py

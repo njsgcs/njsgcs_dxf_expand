@@ -1,19 +1,33 @@
 from pyautocad import Autocad, APoint
 import math
-
+import uuid
+import sys
 def get_lines():
     acad = Autocad()
     doc = acad.doc
-    model_space = doc.ModelSpace
-    
+    print("请在cad里选择对象: \n")
+    try:
+     model_space = doc.ModelSpace
+    except Exception as e:
+        if e.args[1] == "被呼叫方拒绝接收呼叫。":
+            print("被呼叫方拒绝接收呼叫。")
+            print("重启cad文档，再重启程序")
+            input("按回车键退出")
+            sys.exit(1)  # 直接终止程序，返回错误码1
+
+
+    selection_set_name = f"TempSelection_{uuid.uuid4().hex[:8]}"
+    selection_set = doc.SelectionSets.Add(selection_set_name)
+    selection_set.SelectOnScreen()
+    workspace=selection_set if selection_set.Count != 0 else model_space
     inputlines = []
     lineId = 0
     lineMap = {}  # 用于映射 lineId 到实体对象（可选功能）
-
+    
     def round_coords(*coords):
         return [round(coord, 1) for coord in coords]
 
-    for obj in model_space:
+    for obj in workspace:
         try:
             if obj.ObjectName == "AcDbLine":
                 # LINE

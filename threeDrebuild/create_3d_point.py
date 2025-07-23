@@ -139,7 +139,10 @@ def generate_3d_points(clusters):
         "front_points": front_point_list,
         "top_points": top_point_list,
         "right_points": right_point_list,
-        "points_3d": point_3d_list
+        "points_3d": point_3d_list,
+         "right_cluster_min_x":right_cluster.min_x if right_cluster is not None else None,
+        "top_cluster_min_y":top_cluster.min_y if top_cluster is not None else None
+         
     }
 
 

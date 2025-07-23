@@ -9,5 +9,5 @@ https://gitee.com/njsgcs/annotion_dataset
 
 
 
-
+[点击查看演示视频](https://www.bilibili.com/video/BV1cm8czNEX4)
 pyinstaller --onefile --console main.py

@@ -2,7 +2,7 @@ from pyautocad import Autocad, APoint
 import math
 from interferce import Arc3D, Line3D, Circle3D
 # 绘制3D模型
-def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min_y_t,delete):
+def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min_y_t,delete,left_model):
     lines=[]
     arcs=[]
     circles=[]
@@ -38,16 +38,24 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                 radius = round(radius, 1)
                 
                 if view_id == 2:
-                    center_x = center[0] - cluster_min_x_r
+                    arc_entity.color=1
+                    center_x = center[0] - cluster_min_x_r 
+                    center_x=center_x if center_x>0 else -center_x
                     center_y = center[1]
-                    start_x = round(center_x + radius * math.cos(arc_entity.StartAngle), 1)
-                    start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
-                    end_x = round(center_x + radius * math.cos(arc_entity.EndAngle), 1)
-                    end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
-
+                    if not left_model:
+                        start_x = round(center_x + radius * math.cos(arc_entity.StartAngle), 1)
+                        start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
+                        end_x = round(center_x + radius * math.cos(arc_entity.EndAngle), 1)
+                        end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
+                    else :
+                        start_x = round(center_x - radius * math.cos(arc_entity.StartAngle), 1)
+                        start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
+                        end_x = round(center_x - radius * math.cos(arc_entity.EndAngle), 1)
+                        end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
                     normal = APoint(1.0, 0.0, 0.0)
                     if ((start_x == z1 and start_y == y1 and end_x == z2 and end_y == y2)
                         or (start_x == z2 and start_y == y2 and end_x == z1 and end_y == y1)):
+                        
                         center_point = APoint(x1,center_y,center_x)
                         end_anggle = -arc_entity.StartAngle+math.pi/2
                         start_anggle = -arc_entity.EndAngle+math.pi/2

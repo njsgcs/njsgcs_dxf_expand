@@ -85,7 +85,7 @@ def generate_3d_points(clusters):
             front_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, front_point_set, front_point_list)
             add_unique_point(x2f, y2f, front_point_set, front_point_list)
-
+     
     if top_cluster:
         cluster_min_y = top_cluster.min_y
 
@@ -99,7 +99,7 @@ def generate_3d_points(clusters):
             top_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, top_point_set, top_point_list)
             add_unique_point(x2f, y2f, top_point_set, top_point_list)
-
+    left_model=False
     if right_cluster:
         cluster_min_x = right_cluster.min_x
 
@@ -113,7 +113,21 @@ def generate_3d_points(clusters):
             right_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, right_point_set, right_point_list)
             add_unique_point(x2f, y2f, right_point_set, right_point_list)
+    else :
+     if left_cluster:
+        left_model=True
+        cluster_min_x = -left_cluster.max_x
 
+        for line in left_cluster.lines:
+            x1, y1, x2, y2, line_id, line_type = line
+            x1f = round(-x1 - cluster_min_x, 1)
+            y1f = round(y1, 1)
+            x2f = round(-x2 - cluster_min_x, 1)
+            y2f = round(y2, 1)
+            right_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
+            add_unique_point(x1f, y1f, right_point_set, right_point_list)
+            add_unique_point(x2f, y2f, right_point_set, right_point_list)
+         
     # 收集 3D 点
     point_3d_list = []
     seen_3d = set()
@@ -140,10 +154,11 @@ def generate_3d_points(clusters):
         "top_points": top_point_list,
         "right_points": right_point_list,
         "points_3d": point_3d_list,
-         "right_cluster_min_x":right_cluster.min_x if right_cluster is not None else None,
+         "right_cluster_min_x":right_cluster.min_x if right_cluster is not None else left_cluster.max_x if left_cluster is not None else None,
         "top_cluster_min_y":top_cluster.min_y if top_cluster is not None else None,
          "top_cluster_max_y":top_cluster.max_y if top_cluster is not None else None,
          "front_cluster_min_y":most_frequent_cluster.min_y if most_frequent_cluster is not None else None
+         ,"left_model":left_model
     }
 
 

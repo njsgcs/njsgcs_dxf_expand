@@ -6,7 +6,7 @@ from interferce import *
 from pyautocad import Autocad, APoint
 
 class UnfoldProcessor:
-    def __init__(self , lines, arcs, circles, center_arc_map, component_id_map,delete):
+    def __init__(self , lines, arcs, circles, center_arc_map, component_id_map,delete,left_model):
         acad= Autocad(create_if_not_exists=True)
         self.acad = acad
         self.lines = lines
@@ -17,6 +17,7 @@ class UnfoldProcessor:
         self.component_id_map = component_id_map
         self.draw_lines=set({})
         self.draw_circles=set({})
+        self.left_model=left_model
     # 定义一个函数transform_edge，用于转换边
     def translation_matrix(self,translation):
         mat = np.eye(4)
@@ -46,7 +47,8 @@ class UnfoldProcessor:
         # 创建绕法向量在中心点的旋转变换矩阵
         nomal_name=edge_name[-1]
     # print(f"normal: {nomal_name}")
-        if nomal_name=="Z": rangle=- rangle
+        if nomal_name=="Z" : rangle=- rangle
+        if nomal_name=="X" and self.left_model: rangle=- rangle
         rotation_matrix = self.rotation_matrix_from_axis_angle(normal, rangle)
         
         center_translation_matrix =self.translation_matrix(center)

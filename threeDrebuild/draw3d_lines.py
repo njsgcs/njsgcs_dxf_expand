@@ -6,7 +6,10 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
     lines=[]
     arcs=[]
     circles=[]
-    for line in line3d:
+    arc_centers=set()
+    arc_inside_lines=set()
+    sorted_line3d = sorted(line3d, key=lambda line: (line[7] != 1, line[7]))  # line[7]是line_type
+    for line in sorted_line3d:
         # 解构线条数据
         x1, y1, z1, x2, y2, z2, line_id, line_type, color, view_id = line
       
@@ -14,11 +17,17 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
             # 绘制直线
             start_point = APoint(x1, y1, z1)
             end_point = APoint(x2, y2, z2)
-            Line=acad.model.AddLine(start_point, end_point)
-            lines.append(Line3D(Line))
-            if delete:
-               
-                    Line.Delete()
+            start_point_in_arc_center = tuple(start_point) in arc_centers
+            end_point_in_arc_center = tuple(end_point) in arc_centers
+            line_inside_arc = (start_point[0], start_point[1], start_point[2],end_point[0], end_point[1], end_point[2]) in arc_inside_lines\
+            or (end_point[0], end_point[1], end_point[2],start_point[0], start_point[1], start_point[2]) in arc_inside_lines
+            if  not start_point_in_arc_center or not end_point_in_arc_center:
+                if not line_inside_arc:
+                    Line=acad.model.AddLine(start_point, end_point)
+                    lines.append(Line3D(Line))
+                    if delete:
+                    
+                            Line.Delete()
         elif line_type == 1:
             # 绘制圆弧
             entity = line_map.get(line_id)
@@ -42,6 +51,7 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     center_x = center[0] - cluster_min_x_r 
                     center_x=center_x if center_x>0 else -center_x
                     center_y = center[1]
+                    
                     if not left_model:
                         start_x = round(center_x + radius * math.cos(arc_entity.StartAngle), 1)
                         start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
@@ -55,8 +65,10 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     normal = APoint(1.0, 0.0, 0.0)
                     if ((start_x == z1 and start_y == y1 and end_x == z2 and end_y == y2)
                         or (start_x == z2 and start_y == y2 and end_x == z1 and end_y == y1)):
-                        
+                        arc_inside_lines.add(( x1,center_y,center_x,x1, end_y, end_x))
+                        arc_inside_lines.add(( x1, start_y, start_x,x1,center_y,center_x))
                         center_point = APoint(x1,center_y,center_x)
+                        arc_centers.add(( x1,center_y,center_x))
                         end_anggle = -arc_entity.StartAngle+math.pi/2
                         start_anggle = -arc_entity.EndAngle+math.pi/2
                         arc = acad.model.AddArc(center_point, radius,  start_anggle, end_anggle)
@@ -69,6 +81,7 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                 elif view_id == 0:
                     center_x = center[0]
                     center_y = center[1]
+                    
                     start_x = round(center_x + radius * math.cos(arc_entity.StartAngle), 1)
                     start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
                     end_x = round(center_x + radius * math.cos(arc_entity.EndAngle), 1)
@@ -76,7 +89,10 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     normal = APoint(0.0, 0.0, 1.0)
                     if ((start_x == x1 and start_y == y1 and end_x == x2 and end_y == y2)
                         or (start_x == x2 and start_y == y2 and end_x == x1 and end_y == y1)):
+                        arc_inside_lines.add((  center_x, center_y,z1, end_x, end_y, z1))
+                        arc_inside_lines.add(( start_x, start_y, z1,  center_x, center_y,z1))
                         center_point = APoint(center_x, center_y,z1)
+                        arc_centers.add(( center_x, center_y,z1))
                         arc = acad.model.AddArc(center_point, radius, arc_entity.StartAngle, arc_entity.EndAngle)
                         arc.Normal = normal
                         Aarc= Arc3D(arc,APoint(start_x, start_y, z1),APoint(end_x, end_y, z1),view_id, arc_entity.StartAngle, arc_entity.EndAngle)
@@ -87,13 +103,17 @@ def draw_3d_model(acad : Autocad,line3d, line_map,  cluster_min_x_r, cluster_min
                     normal = APoint(0.0, 1.0, 0.0)
                     center_x = center[0]
                     center_y = center[1] - cluster_min_y_t
+                    
                     start_x = round(center_x + radius * math.cos(arc_entity.StartAngle), 1)
                     start_y = round(center_y + radius * math.sin(arc_entity.StartAngle), 1)
                     end_x = round(center_x + radius * math.cos(arc_entity.EndAngle), 1)
                     end_y = round(center_y + radius * math.sin(arc_entity.EndAngle), 1)
                     if ((start_x == x1 and start_y == z1 and end_x == x2 and end_y == z2)
                         or (start_x == x2 and start_y == z2 and end_x == x1 and end_y == z1)):
+                        arc_inside_lines. add(( center_x, y1,center_y,end_x, y1,end_y))
+                        arc_inside_lines. add(( start_x, y1,start_y,center_x, y1,center_y))
                         center_point = APoint(center_x, y1,center_y)
+                        arc_centers.add(( center_x, y1,center_y))
                         start_anggle = arc_entity.StartAngle+math.pi/2
                         end_anggle = arc_entity.EndAngle+math.pi/2
                         arc = acad.model.AddArc(center_point, radius, start_anggle, end_anggle)

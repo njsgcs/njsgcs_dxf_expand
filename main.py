@@ -1,5 +1,7 @@
 delete=False
-delete=True
+#delete=True
+print("请在cad没有选择对象的情况下选择对象: \n")
+print("按下回车后就不要动鼠标了")
 from threeDrebuild.ThreeDRebuilder import ThreeDRebuilder
 
 

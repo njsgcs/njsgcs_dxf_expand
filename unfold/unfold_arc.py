@@ -18,6 +18,7 @@ class UnfoldProcessor:
         self.draw_lines=set({})
         self.draw_circles=set({})
         self.left_model=left_model
+       
     # 定义一个函数transform_edge，用于转换边
     def translation_matrix(self,translation):
         mat = np.eye(4)

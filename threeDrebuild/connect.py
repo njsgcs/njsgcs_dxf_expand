@@ -5,7 +5,7 @@ import sys
 def get_lines():
     acad = Autocad()
     doc = acad.doc
-    print("请在cad没有选择对象的情况下选择对象: \n")
+    
     try:
      model_space = doc.ModelSpace
     except Exception as e:

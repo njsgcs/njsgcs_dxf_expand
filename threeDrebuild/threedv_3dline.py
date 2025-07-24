@@ -1,14 +1,16 @@
-def is_point_on_line_segment(px, py, x1, y1, x2, y2, epsilon=1e-10):
+def is_point_on_line_segment(px, py, x1, y1, x2, y2, epsilon=0.2):
     cross_product = (py - y1) * (x2 - x1) - (px - x1) * (y2 - y1)
+    is_point_on_line=True
     if abs(cross_product) > epsilon:
-        return False
+         is_point_on_line=False
 
     dot_product = (px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)
     if dot_product < 0:
-        return False
+        is_point_on_line= False
 
     squared_length = (x2 - x1) ** 2 + (y2 - y1) ** 2
-    return dot_product <= squared_length
+    if is_point_on_line:is_point_on_line=dot_product <= squared_length+0.2
+    return is_point_on_line,cross_product,dot_product,squared_length
 
 def make_map(lines, points):
     """
@@ -40,10 +42,15 @@ def make_map(lines, points):
     # 遍历所有线段
     for x1, y1, x2, y2, line_id, type_ in lines:
         relevant_points = []  # 存储在线段上的点
-        
+ 
         # 检查每个点是否在线段上
         for px, py in points:
-            if is_point_on_line_segment(px, py, x1, y1, x2, y2):
+            is_point_on_line,cross_product,dot_product,squared_length=is_point_on_line_segment(px, py, x1, y1, x2, y2)
+            if px==133.7 and py==117.9:
+                if(x1==103.7 and y1==117.9 and x2==133.7 and y2==117.9):
+            
+                 pass
+            if is_point_on_line:
                 # 如果点在线段上，将其添加到相关点列表中
                 pxf = round(px, 1)  # 将点坐标四舍五入到一位小数
                 pyf = round(py, 1)
@@ -53,7 +60,7 @@ def make_map(lines, points):
                 key = f"{pxf},{pyf},{pxf},{pyf}"
                 if type_ == 0:  # 只有当线段类型为0时才添加
                     map_obj[key] = {'lineid': line_id, 'type': type_}
-        
+     
         # 连接相关点对
         for i in range(len(relevant_points)):
             for j in range(i + 1, len(relevant_points)):
@@ -143,7 +150,12 @@ def generate_3d_lines(point3dlist,frontlinelist, toplinelist, rightlinelist,fron
             exist_in_front = frontpointmap.get(front_key)
             exist_in_top = toppointmap.get(top_key)
             exist_in_right = rightpointmap.get(right_key)
-       
+            
+            if (x1f==103.7 and y1f==117.9 and z1f==20.0 \
+                and x2f==133.7 and y2f==117.9 and z2f==20.0)\
+            or (x2f==103.7 and y2f==117.9 and z2f==20.0 \
+                and x1f==133.7 and y1f==117.9 and z1f==20.0):
+                pass
             if exist_in_front and exist_in_top and exist_in_right:
                 frontline_id = exist_in_front['lineid']
                 fronttype = exist_in_front['type']

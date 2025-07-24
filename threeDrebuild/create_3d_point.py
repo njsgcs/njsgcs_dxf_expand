@@ -71,16 +71,17 @@ def generate_3d_points(clusters):
     front_point_list = []
     top_point_list = []
     right_point_list = []
-
+    def step0point2(x):
+      return round(x / 0.2) * 0.2
     if most_frequent_cluster:
         cluster_min_y = top_cluster.min_y if top_cluster else 0
 
         for line in most_frequent_cluster.lines:
             x1, y1, x2, y2, line_id, line_type = line
-            x1f = round(x1, 1)
-            y1f = round(y1, 1)
-            x2f = round(x2, 1)
-            y2f = round(y2, 1)
+            x1f = round(step0point2(x1), 1)
+            y1f = round ( step0point2( y1), 1)
+            x2f = round(step0point2(x2), 1)
+            y2f = round(step0point2(y2), 1)
 
             front_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, front_point_set, front_point_list)
@@ -91,10 +92,10 @@ def generate_3d_points(clusters):
 
         for line in top_cluster.lines:
             x1, y1, x2, y2, line_id, line_type = line
-            x1f = round(x1, 1)
-            y1f = round(y1 - cluster_min_y, 1)
-            x2f = round(x2, 1)
-            y2f = round(y2 - cluster_min_y, 1)
+            x1f = round(step0point2(x1), 1)
+            y1f = round(step0point2(y1 - cluster_min_y), 1)
+            x2f = round(step0point2(x2), 1)
+            y2f = round(step0point2(y2 - cluster_min_y), 1)
 
             top_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, top_point_set, top_point_list)
@@ -105,10 +106,10 @@ def generate_3d_points(clusters):
 
         for line in right_cluster.lines:
             x1, y1, x2, y2, line_id, line_type = line
-            x1f = round(x1 - cluster_min_x, 1)
-            y1f = round(y1, 1)
-            x2f = round(x2 - cluster_min_x, 1)
-            y2f = round(y2, 1)
+            x1f = round(step0point2(x1 - cluster_min_x), 1)
+            y1f = round(step0point2(y1), 1)
+            x2f = round(step0point2(x2 - cluster_min_x), 1)
+            y2f = round(step0point2(y2), 1)
 
             right_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, right_point_set, right_point_list)
@@ -120,10 +121,10 @@ def generate_3d_points(clusters):
 
         for line in left_cluster.lines:
             x1, y1, x2, y2, line_id, line_type = line
-            x1f = round(-x1 - cluster_min_x, 1)
-            y1f = round(y1, 1)
-            x2f = round(-x2 - cluster_min_x, 1)
-            y2f = round(y2, 1)
+            x1f = round(step0point2(-x1 - cluster_min_x), 1)
+            y1f = round(step0point2(y1), 1)
+            x2f = round(step0point2(-x2 - cluster_min_x), 1)
+            y2f = round(step0point2(y2), 1)
             right_line_list.append([x1f, y1f, x2f, y2f, line_id, line_type])
             add_unique_point(x1f, y1f, right_point_set, right_point_list)
             add_unique_point(x2f, y2f, right_point_set, right_point_list)
@@ -134,7 +135,7 @@ def generate_3d_points(clusters):
 
     for fx, fy in front_point_list:
         for tx, ty in top_point_list:
-            if abs(fx - tx) < 1e-6:  # 浮点精度容差
+            if abs(fx - tx) < 0.1:  # 浮点精度容差
                 key = f"{fx},{fy},{ty}"
                 if key not in seen_3d:
                     seen_3d.add(key)

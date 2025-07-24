@@ -121,8 +121,8 @@ class UnfoldProcessor:
         # 访问当前节点
         print(node)
         visited.add(node)
-        component_edges=self.component_id_map[node]["component_edges"]
-        component_points=self.component_id_map[node]["component_points"]
+        component_edges=self.component_id_map[node] ["component_edges"]
+        component_points= self.component_id_map[node] ["component_points"]
         self.excuse_transform(node,component_points, component_edges, last_transform)
         # 遍历邻居节点
         for neighbor in graph[node]:

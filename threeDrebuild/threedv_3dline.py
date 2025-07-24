@@ -68,15 +68,11 @@ def make_map(lines, points):
                 p1x, p1y = relevant_points[i]
                 p2x, p2y = relevant_points[j]
                 
-                # 将点坐标四舍五入到一位小数
-                p1xf = round(p1x, 1)
-                p1yf = round(p1y, 1)
-                p2xf = round(p2x, 1)
-                p2yf = round(p2y, 1)
+       
                 
                 # 创建两个方向的映射（点1到点2和点2到点1）
-                key1 = f"{p1xf},{p1yf},{p2xf},{p2yf}"
-                key2 = f"{p2xf},{p2yf},{p1xf},{p1yf}"
+                key1 = f"{p1x},{p1y},{p2x},{p2y}"
+                key2 = f"{p2x},{p2y},{p1x},{p1y}"
                 
                 # 添加映射到字典中
                 map_obj[key1] = {'lineid': line_id, 'type': type_}
@@ -151,10 +147,10 @@ def generate_3d_lines(point3dlist,frontlinelist, toplinelist, rightlinelist,fron
             exist_in_top = toppointmap.get(top_key)
             exist_in_right = rightpointmap.get(right_key)
             
-            if (x1f==103.7 and y1f==117.9 and z1f==20.0 \
-                and x2f==133.7 and y2f==117.9 and z2f==20.0)\
-            or (x2f==103.7 and y2f==117.9 and z2f==20.0 \
-                and x1f==133.7 and y1f==117.9 and z1f==20.0):
+            if (x1f==128.9 and y1f==119.0 and z1f==28.0\
+                and x2f==128.9  and y2f==119.0 and z2f==31.0)\
+            or (x2f==128.9  and y2f==119.0 and z2f==31.0 \
+                and x1f==128.9  and y1f==119.0 and z1f==28.0):
                 pass
             if exist_in_front and exist_in_top and exist_in_right:
                 frontline_id = exist_in_front['lineid']

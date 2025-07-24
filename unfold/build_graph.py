@@ -8,6 +8,7 @@ def get_graph(lines, arcs: List[Arc3D]):
     G_without_arcs = nx.Graph()
     center_SEpair_map: Dict[str,  List[Any]] = {}
     center_arc_map: Dict[str,  Any] = {}
+    center_start_angle_map: Dict[str,  Any] = {}
     # 添加线条到图中
     for line in lines:
         
@@ -38,18 +39,24 @@ def get_graph(lines, arcs: List[Arc3D]):
          
         # 将 arc 添加到 centermap 中对应的集合中
         if center_key not in center_SEpair_map:
+           
             center_SEpair_map[center_key] = []
             center_arc_map[center_key] = arc
-        center_SEpair_map[center_key].append([arc.start_point, arc.end_point])
+            center_start_angle_map[center_key] = arc.start_angle
+        if arc.start_angle==center_start_angle_map[center_key]:
+         center_SEpair_map[center_key].append([arc.start_point, arc.end_point])
+        else:
+         center_SEpair_map[center_key].append([arc.end_point, arc.start_point])
         # 这里可以添加更多逻辑来处理圆弧的离散化，并将中间点加入图中
       
     for center_key in center_SEpair_map:
         sepairs = center_SEpair_map[center_key]
-
+  
         seen = set()
         unique_sepairs = []
 
         for sepair in sepairs:
+            
             start, end = sepair
             # 将 APoint 转换为元组，并保留一位小数
             start_tuple = tuple(round(x, 1) for x in (start.x, start.y, start.z))

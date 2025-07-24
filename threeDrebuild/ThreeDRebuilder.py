@@ -31,7 +31,7 @@ class ThreeDRebuilder:
         """对线段进行聚类"""
         if self.lines is None:
             raise ValueError("Lines not loaded. Call load_lines() first.")
-        self.clusters = cluster_lines(self.lines, expand_distance=self.expand_distance)
+        self.clusters = cluster_lines(self.lines, self.expand_distance,self.acad,self.delete)
 
     def generate_3d_points(self):
         """生成 3D 点集合"""

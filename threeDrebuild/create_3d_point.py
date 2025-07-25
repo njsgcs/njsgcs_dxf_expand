@@ -72,7 +72,7 @@ def generate_3d_points(clusters):
     top_point_list = []
     right_point_list = []
     def step0point2(x):
-      return round(x / 0.2) * 0.2
+      return x 
     if most_frequent_cluster:
         cluster_min_y = top_cluster.min_y if top_cluster else 0
 
